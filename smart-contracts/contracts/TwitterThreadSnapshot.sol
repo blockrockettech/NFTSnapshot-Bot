@@ -4,6 +4,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
 // TODO add access controls to ensure only bot can mint and only admin can call admin functions
 
+// TODO - is there a twitter ID we can use to enforce uniqueness in the thread being rolled up?
+// TODO - look at Filecoin hash length validation - is it the same as IPFS?
+// TODO - Pricing models?
+// TODO - ability to set base price fee as admin / or is the price variable - how to get base base?
+// TODO - setting expiry on NFT - user has to maintain valida Filecoin has the NFT to be valid?
+
 /**
  * @title Twitter Thread Snapshot / Tokenization Smart Contact
  * @notice Tokenizes twitter threads stored on the Filecoin network
