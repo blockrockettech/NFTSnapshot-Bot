@@ -1,14 +1,12 @@
 <template>
   <div class="home">
     <h3>Filecoin Network Info</h3>
+    <p>Versions: {{fileCoin.versions || 'Loading...'}}</p>
     <p>Block Height: {{fileCoin.height || 'Loading...'}}</p>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-//import HelloWorld from '@/components/HelloWorld.vue'
-
 import LotusRPC from '@filecoin-shipyard/lotus-client-rpc';
 import BrowserProvider from '@filecoin-shipyard/lotus-client-provider-browser';
 import schema from '@filecoin-shipyard/lotus-client-schema/prototype/testnet-v3';
@@ -19,6 +17,7 @@ export default {
   data() {
     return {
       fileCoin: {
+        versions: null,
         height: null
       }
     };
@@ -28,6 +27,9 @@ export default {
 
     const provider = new BrowserProvider(wsUrl)
     const client = new LotusRPC(provider, { schema })
+
+    const versions = await client.version()
+    this.fileCoin.versions = versions;
 
     setInterval(async () => {
       const result = await client.chainHead()
