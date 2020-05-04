@@ -3,6 +3,9 @@
     <h3>Filecoin Network Info</h3>
     <p>Versions: {{fileCoin.versions || 'Loading...'}}</p>
     <p>Block Height: {{fileCoin.height || 'Loading...'}}</p>
+
+    <h3 style="margin-top: 2em;">Your Account ({{wallet.address}})</h3>
+    <p>Wallet balance: {{wallet.balance}}</p>
   </div>
 </template>
 
@@ -19,6 +22,11 @@ export default {
       fileCoin: {
         versions: null,
         height: null
+      },
+      wallet: {
+        //address: 't1myka6u7mq6uzi2tlnjttmdc7c6aimolcgywi5ca',
+        address: 't3re3sdjgqjgj6w4rwuggh24loy564sgibjh6z6wn6gm2abwxenulspk3vxweeiecdr4pwyj4ikribks5ib4la',
+        balance: null
       }
     };
   },
@@ -30,6 +38,9 @@ export default {
 
     const versions = await client.version()
     this.fileCoin.versions = versions;
+
+    const walletBalance = await client.walletBalance(this.wallet.address);
+    this.wallet.balance = walletBalance;
 
     setInterval(async () => {
       const result = await client.chainHead()
