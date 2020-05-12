@@ -61,43 +61,48 @@ class TwitterService {
       }
     }
 
-    return thread;
+    return _.compact(thread);
   }
 
   async getTweetById(tweetId) {
-    console.log('Getting tweet by ID', tweetId);
+    try {
+      console.log('Getting tweet by ID', tweetId);
 
-    const tweet = await this.twit.get('statuses/show', {id: tweetId});
+      const tweet = await this.twit.get('statuses/show', {id: tweetId});
 
-    if (!tweet || tweet.resp.statusCode !== 200) {
-      console.error('No tweet found or status code not 200 from API');
+      if (!tweet || tweet.resp.statusCode !== 200) {
+        console.error('No tweet found or status code not 200 from API');
+        return null;
+      }
+
+      const {data} = tweet;
+      const {user, id_str, created_at, text, in_reply_to_status_id_str} = data;
+
+      return {
+        // Grab some tweet data
+        id_str,
+        created_at,
+        text,
+        reply_id: in_reply_to_status_id_str,
+
+        // Grab some user data
+        user: {
+          id_str: user.id_str,
+          name: user.name,
+          screen_name: user.screen_name,
+          description: user.description,
+          created_at: user.created_at,
+          profile_image_url: user.profile_image_url,
+          profile_image_url_https: user.profile_image_url_https,
+          profile_background_color: user.profile_background_color,
+          profile_text_color: user.profile_text_color,
+          profile_use_background_image: user.profile_use_background_image,
+        },
+      };
+    } catch (e) {
+      console.error(`Unable to get tweet for ID [${tweetId}]`, e);
       return null;
     }
-
-    const {data} = tweet;
-    const {user, id_str, created_at, text, in_reply_to_status_id_str} = data;
-
-    return {
-      // Grab some tweet data
-      id_str,
-      created_at,
-      text,
-      reply_id: in_reply_to_status_id_str,
-
-      // Grab some user data
-      user: {
-        id_str: user.id_str,
-        name: user.name,
-        screen_name: user.screen_name,
-        description: user.description,
-        created_at: user.created_at,
-        profile_image_url: user.profile_image_url,
-        profile_image_url_https: user.profile_image_url_https,
-        profile_background_color: user.profile_background_color,
-        profile_text_color: user.profile_text_color,
-        profile_use_background_image: user.profile_use_background_image,
-      },
-    };
   };
 
   async tweetRollupConfirmation(tweetId) {
