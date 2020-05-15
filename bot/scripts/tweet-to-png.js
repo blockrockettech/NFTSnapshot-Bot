@@ -8,13 +8,21 @@ const axios = require('axios');
     });
   }
 
-  const thread = encodeURIComponent(`https://twitter.com/BlockRocketTech/status/1247098772221562880`);
+  const thread = encodeURIComponent(`https://twitter.com/BlockRocketTech/status/1247098778928193536`);
 
   const {data} = await axios.get(`https://publish.twitter.com/oembed?url=${thread}&align=center`);
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
+
+  await page.setViewport({
+    width: 550,
+    height: 1200,
+    deviceScaleFactor: 1,
+  });
+
   await page.setContent(data.html);
+
 
   await sleep(3000); // allow script to load? Not sure if this is needed
 
