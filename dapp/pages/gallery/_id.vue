@@ -1,6 +1,7 @@
 <template>
   <div class="columns is-centered">
-    <div v-if="tweetById" class="column is-four-fifths">
+    <div v-if="tweetByStatusId" class="column is-four-fifths has-background-primary is-size-1">
+      {{ tweetByStatusId }}
     </div>
     <div v-else class="column">
       No tweet for {{ $route.params.id }}
@@ -13,14 +14,15 @@
     components: {},
     data() {
       return {
-        tweetById: null,
+        tweetByStatusId: null,
       };
     },
     async asyncData({app, params, $axios}) {
-      console.log($axios);
-      console.log(params);
+      // const thread = encodeURIComponent(`https://twitter.com/BlockRocketTech/status/${params.id}`);
+      // const tweetByStatusId = await $axios.$get(`https://publish.twitter.com/oembed?url=${thread}&align=center`)
 
-      return {};
+
+      return {tweetByStatusId: params.id};
     },
     // head() {
     //   return {
