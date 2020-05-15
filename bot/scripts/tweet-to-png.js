@@ -23,7 +23,6 @@ const axios = require('axios');
 
   await page.setContent(data.html);
 
-
   await sleep(3000); // allow script to load? Not sure if this is needed
 
   await page.screenshot({path: `./scripts/temp/tweet-${new Date().getTime()}.png`});
