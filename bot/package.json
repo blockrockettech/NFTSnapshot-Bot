@@ -11,8 +11,10 @@
   "license": "MIT",
   "dependencies": {
     "@google-cloud/firestore": "^3.7.5",
+    "axios": "^0.19.2",
     "dotenv": "^8.2.0",
     "lodash": "^4.17.15",
+    "puppeteer": "^3.0.4",
     "twit": "^2.2.11"
   },
   "devDependencies": {
