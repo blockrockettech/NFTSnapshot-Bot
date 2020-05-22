@@ -3,7 +3,9 @@ require('./config');
 module.exports = {
   mode: 'universal',
   server: {
-    port: process.env.PORT
+    port: process.env.PORT || 3000,
+    host: "0.0.0.0",
+    timing: false
   },
   /*
    * Headers of the page
@@ -129,6 +131,11 @@ module.exports = {
   ** Build configuration
   */
   build: {
+    transpile: [
+      '@filecoin-shipyard/lotus-client-rpc',
+      '@filecoin-shipyard/lotus-client-provider-browser',
+      '@filecoin-shipyard/lotus-client-schema'
+    ],
     /*
     ** You can extend webpack config here
     */

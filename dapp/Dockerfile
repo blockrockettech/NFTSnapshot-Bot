@@ -11,13 +11,13 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install production dependencies.
-RUN npm install --only=production
-
-# Install production dependencies.
-RUN npm run build
+RUN npm install
 
 # Copy local code to the container image.
 COPY . .
+
+# Install production dependencies.
+RUN npm run build
 
 # Service must listen to $PORT environment variable.
 # This default value facilitates local development.
