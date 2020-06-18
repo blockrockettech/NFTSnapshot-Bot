@@ -79,10 +79,6 @@
 </template>
 
 <script>
-  import LotusRPC from '@filecoin-shipyard/lotus-client-rpc';
-  import BrowserProvider from '@filecoin-shipyard/lotus-client-provider-browser';
-  import schema from '@filecoin-shipyard/lotus-client-schema/prototype/testnet-v3';
-
   export default {
     head() {
       return {
@@ -113,18 +109,9 @@
       }
     },
     async mounted() {
-      const wsUrl = 'wss://lotus.testground.ipfs.team/api/0/node/rpc/v0';
-      const provider = new BrowserProvider(wsUrl);
-      const client = new LotusRPC(provider, {schema});
-      const {Version, APIVersion, BlockDelay} = await client.version();
-      this.fileCoin.version = Version;
-      this.fileCoin.apiVersion = APIVersion;
-      this.fileCoin.blockDelay = BlockDelay;
-      this.wallet.balance = await client.walletBalance(this.wallet.address);
-      setInterval(async () => {
-        const result = await client.chainHead();
-        this.fileCoin.height = result.Height;
-      }, 1000);
+      this.fileCoin.version = '';
+      this.fileCoin.apiVersion = '';
+      this.fileCoin.blockDelay = '';
     }
   };
 </script>

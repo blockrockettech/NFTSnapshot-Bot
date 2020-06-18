@@ -1,7 +1,23 @@
 <template>
   <div class="columns is-centered">
-    <div v-if="tweetByStatusId" class="column is-four-fifths has-background-primary is-size-1">
-      {{ tweetByStatusId }}
+    <div v-if="tweetByStatusId">
+      <div class="column is-four-fifths has-background-primary is-size-1">
+        {{ tweetByStatusId }}
+      </div>
+      <div v-if="threadData && threadData.thread">
+        <h2>Thread:</h2>
+        <br/>
+        <div v-for="(tweet,idx) in threadData.thread" :key="idx">
+          {{threadData.thread.length-idx}}/{{threadData.thread.length}}: {{tweet.text}}
+        </div>
+
+        <br/>
+        <h2>IPFS Hash:</h2>
+        {{threadData.ipfsHash}}
+
+        <br/>
+        <b-button>Buy Thread</b-button>
+      </div>
     </div>
     <div v-else class="column">
       No tweet for {{ $route.params.id }}
@@ -10,19 +26,34 @@
 </template>
 
 <script>
+  import firebase from "firebase";
+  // Required for side-effects
+  import "firebase/firestore";
+
   export default {
     components: {},
     data() {
       return {
         tweetByStatusId: null,
+        threadData: null,
       };
     },
     async asyncData({app, params, $axios}) {
-      // const thread = encodeURIComponent(`https://twitter.com/BlockRocketTech/status/${params.id}`);
-      // const tweetByStatusId = await $axios.$get(`https://publish.twitter.com/oembed?url=${thread}&align=center`)
-
-
       return {tweetByStatusId: params.id};
+    },
+    async mounted() {
+      const tweetId = '1273580198647271431';
+
+      firebase.initializeApp({
+       //TODO this is temporary - will move into a service
+      });
+
+      var db = firebase.firestore();
+
+      const tweet = await db.collection('tweets').doc(tweetId).get();
+
+      this.threadData = tweet.data();
+      console.log(this.threadData);
     },
     // head() {
     //   return {
