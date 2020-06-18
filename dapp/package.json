@@ -13,6 +13,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "@filecoin-shipyard/lotus-client-provider-browser": "0.0.6",
+    "@filecoin-shipyard/lotus-client-rpc": "0.0.8",
+    "@filecoin-shipyard/lotus-client-schema": "0.0.9",
     "@nuxtjs/axios": "^5.10.3",
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/pwa": "^3.0.0-0",
