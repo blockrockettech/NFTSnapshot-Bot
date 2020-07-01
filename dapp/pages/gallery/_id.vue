@@ -16,7 +16,7 @@
         {{threadData.ipfsHash}}
 
         <br/>
-        <b-button>Buy Thread</b-button>
+        <b-button @click="buy">Buy Thread</b-button>
       </div>
     </div>
     <div v-else class="column">
@@ -26,34 +26,77 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex';
+
   import firebase from "firebase";
   // Required for side-effects
   import "firebase/firestore";
+  import FirebaseConfig from "../../_keys/firebase.json";
+
+  import { ffs } from "@textile/powergate-client";
+
+  import PowergateService from '../../services/PowergateService';
+
+  const powergateService = new PowergateService();
 
   export default {
-    components: {},
+    computed: {
+      ...mapGetters('web3ethers', [
+         'nftContract',
+         'account'
+      ]),
+    },
     data() {
       return {
         tweetByStatusId: null,
         threadData: null,
       };
     },
-    async asyncData({app, params, $axios}) {
+    async asyncData({app, params}) {
       return {tweetByStatusId: params.id};
     },
     async mounted() {
-      const tweetId = '1273580198647271431';
-
-      firebase.initializeApp({
-       //TODO this is temporary - will move into a service
-      });
+      firebase.initializeApp(FirebaseConfig);
 
       var db = firebase.firestore();
 
-      const tweet = await db.collection('tweets').doc(tweetId).get();
+      const tweet = await db.collection('tweets').doc(this.tweetByStatusId).get();
 
       this.threadData = tweet.data();
       console.log(this.threadData);
+    },
+    methods: {
+      async buy() {
+        console.log('buy started...')
+
+        // const json = {
+        //   hello: 'world'
+        // };
+        //
+        // const cid = await powergateService.addDataToIpfs(json);
+        console.log('create storage deal...')
+        const jobId = await powergateService.storeIpfsDataOnFileCoin(this.threadData.ipfsHash);
+
+        const mintNft = this.mintNft;
+        const callback = (job) => {
+          if (job.status === ffs.JobStatus.CANCELED) {
+            console.log("job canceled")
+          } else if (job.status === ffs.JobStatus.FAILED) {
+            console.log("job failed")
+          } else if (job.status === ffs.JobStatus.SUCCESS) {
+            console.log("job success!")
+            mintNft();
+          }
+        };
+
+        console.log('job id', jobId);
+
+        powergateService.watchJob(jobId, callback);
+        powergateService.watchLogs(this.threadData.ipfsHash);
+      },
+      async mintNft() {
+        await this.nftContract.mint(this.threadData.ipfsHash, this.account);
+      },
     },
     // head() {
     //   return {

@@ -94,6 +94,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/filters.js',
+    '~/plugins/web3ethers.client.js'
   ],
   /*
   ** Nuxt.js dev-modules

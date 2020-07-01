@@ -1,5 +1,4 @@
 const { createPow } = require("@textile/powergate-client");
-const { ffs } = require("@textile/powergate-client");
 const {Buffer} = require("buffer");
 
 class PowergateService {

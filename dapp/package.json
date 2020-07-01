@@ -16,6 +16,7 @@
     "@nuxtjs/axios": "^5.10.3",
     "@nuxtjs/dotenv": "^1.4.0",
     "@nuxtjs/pwa": "^3.0.0-0",
+    "@textile/powergate-client": "0.1.0-beta.9",
     "buefy": "^0.8.17",
     "bulma": "^0.8.2",
     "cross-env": "^5.2.0",

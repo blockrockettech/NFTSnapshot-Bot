@@ -1,6 +1,8 @@
 const _ = require('lodash');
 const PowergateService = require('./PowergateService');
 
+const SampleImage = require('../SampleBase64Encoded1MBImage.json');
+
 class DataStoreService {
 
   constructor(db) {
@@ -14,7 +16,7 @@ class DataStoreService {
     const timestamp = Date.now();
     const metadata = {
       name: tweetId,
-      image: 'https://about.twitter.com/etc/designs/about-twitter/public/img/favicon-32x32.png',//TODO
+      image: SampleImage.data,
       description: JSON.stringify(thread),
       attributes: {
         userId,
@@ -35,7 +37,6 @@ class DataStoreService {
         timestamp,
         thread,
         ipfsHash,
-        nftMetadata: metadata
       });
   }
 
