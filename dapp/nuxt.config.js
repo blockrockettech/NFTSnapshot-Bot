@@ -94,6 +94,8 @@ module.exports = {
   */
   plugins: [
     '~/plugins/filters.js',
+    '~/plugins/firebase.js',
+    '~/plugins/powergateService.client.js',
     '~/plugins/web3ethers.client.js'
   ],
   /*

@@ -1,14 +1,13 @@
 <template>
   <div class="columns is-centered">
     <div v-if="tweetByStatusId">
-      <div class="column is-four-fifths has-background-primary is-size-1">
-        {{ tweetByStatusId }}
-      </div>
       <div v-if="threadData && threadData.thread">
-        <h2>Thread:</h2>
+        <div class="column is-four-fifths is-size-3">
+            {{threadData.threadName}}
+        </div>
         <br/>
-        <div v-for="(tweet,idx) in threadData.thread" :key="idx">
-          {{threadData.thread.length-idx}}/{{threadData.thread.length}}: {{tweet.text}}
+        <div v-for="(tweet,idx) in threadData.thread.reverse()" :key="idx">
+          {{idx+1}}/{{threadData.thread.length}}: {{tweet.text}}
         </div>
 
         <br/>
@@ -34,15 +33,8 @@
   import {mapGetters} from 'vuex';
 
   import firebase from "firebase";
-  // Required for side-effects
   import "firebase/firestore";
   import FirebaseConfig from "../../_keys/firebase.json";
-
-  import { ffs } from "@textile/powergate-client";
-
-  import PowergateService from '../../services/PowergateService';
-
-  const powergateService = new PowergateService();
 
   export default {
     computed: {
@@ -62,21 +54,9 @@
       return {tweetByStatusId: params.id};
     },
     async mounted() {
-      // TODO - move service initialisation out of this method. Just here visiting temporarily
-      // Init firebase
+      // TODO this is temp until I can get the plugin to work
       firebase.initializeApp(FirebaseConfig);
-      var db = firebase.firestore();
-
-      // Init powergate service
-      let token = powergateService.getTokenFromStorage();
-      if (token === null || token === 'null') {
-        // we need to get a token
-        console.log('getting a new ffs token...');
-        token = await powergateService.requestToken();
-      }
-
-      powergateService.setToken(token);
-      powergateService.setTokenInLocalStorage(token);
+      const db = firebase.firestore();
 
       // Get tweet
       const tweet = await db.collection('tweets').doc(this.tweetByStatusId).get();
@@ -89,7 +69,7 @@
         console.log('buy started...')
 
         console.log('create storage deal...')
-        const jobId = await powergateService.storeIpfsDataOnFileCoin(this.threadData.ipfsHash);
+        const jobId = await this.$powergateService.storeIpfsDataOnFileCoin(this.threadData.ipfsHash);
         console.log('job id', jobId);
 
         const logCallback = (log) => {
@@ -101,7 +81,7 @@
           }
         };
 
-        powergateService.watchLogs(logCallback, this.threadData.ipfsHash);
+        this.$powergateService.watchLogs(logCallback, this.threadData.ipfsHash);
       },
       async mintNft() {
         await this.nftContract.mint(this.threadData.ipfsHash, this.account);

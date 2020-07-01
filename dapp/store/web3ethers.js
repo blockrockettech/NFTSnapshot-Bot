@@ -3,9 +3,6 @@ import {ethers} from 'ethers';
 
 import TwitterThreadSnapshotTruffleConf from '../truffleconf/TwitterThreadSnapshot.json';
 
-let signer;
-let nft;
-
 function getContractAddressFromTruffleConf(truffleConf, chainId) {
   if (!truffleConf || !chainId) return '';
   const {networks} = truffleConf;
@@ -19,10 +16,11 @@ function getContractAddressFromTruffleConf(truffleConf, chainId) {
 export const state = () => ({
   account: null,
   chainId: 5777, // TODO default to a live network
+  nftContract: null,
 });
 
 export const getters = {
-  nftContract: () => nft,
+  nftContract: (state) => state.nftContract,
   account: (state) => state.account
 };
 
@@ -34,6 +32,10 @@ export const mutations = {
   setChainId(state, chainId) {
     state.chainId = chainId;
   },
+
+  setNftContract(state, nftContract) {
+    state.nftContract = nftContract;
+  }
 };
 
 export const actions = {
@@ -42,16 +44,18 @@ export const actions = {
       console.log('bootstrapping ethers', web3);
 
       const provider = new ethers.providers.Web3Provider(web3.currentProvider);
-      signer = provider.getSigner();
+      const signer = provider.getSigner();
       const chain = await provider.getNetwork();
 
       const nftContractAddress = getContractAddressFromTruffleConf(TwitterThreadSnapshotTruffleConf, chain.chainId);
 
-      nft = new ethers.Contract(
+      const nftContract = new ethers.Contract(
           nftContractAddress,
           TwitterThreadSnapshotTruffleConf.abi,
           signer,
       );
+
+      commit('setNftContract', nftContract);
 
       const accounts = await provider.listAccounts();
       const account = accounts && accounts[0];

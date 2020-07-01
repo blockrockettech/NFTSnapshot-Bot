@@ -10,12 +10,22 @@ class DataStoreService {
   }
 
   async saveThread(tweetId, userId, thread) {
+    if (!thread || thread.length === 0) {
+      throw new Error('Error: attempt to save an empty thread');
+    }
+
     console.log('Saving thread for tweet ID', tweetId);
 
     console.log('Step 1 - Attempt to generate NFT metadata and push to IPFS for caching');
+
+    const firstTweet = thread[thread.length-1];
+    const firstTweetSnippet = `'${firstTweet.text.substring(0, 100)}...'`;
+    const threadAuthorUsername = firstTweet.user.screen_name;
+    const threadName = `${threadAuthorUsername} - ${firstTweetSnippet}`;
+
     const timestamp = Date.now();
     const metadata = {
-      name: tweetId,
+      name: threadName,
       image: SampleImage.data,
       description: JSON.stringify(thread),
       attributes: {
@@ -37,6 +47,7 @@ class DataStoreService {
         timestamp,
         thread,
         ipfsHash,
+        threadName,
       });
   }
 

@@ -35,12 +35,9 @@
                             Filecoin Network Info
                         </p>
                         <div class="subtitle is-6">
-                            Versions: {{fileCoin.version || 'Loading...'}} <br/>
-                            API V: {{fileCoin.apiVersion || 'Loading...'}} <br/>
-                            BlockDelay: {{fileCoin.blockDelay || 'Loading...'}} <br/>
-                            Block Height: {{fileCoin.height || 'Loading...'}} <br/>
-                            Account: {{dotDotDot(wallet.address) || 'Loading...'}} <br/>
-                            Wallet balance: {{wallet.balance || 'Loading...'}}
+                            Status {{status}} <br/>
+                            Account: {{shortAccount}} <br/>
+                            Balance: {{balance}} <br/>
                         </div>
                     </div>
                 </div>
@@ -79,7 +76,21 @@
 </template>
 
 <script>
+    import {mapGetters} from 'vuex';
+
   export default {
+    computed: {
+      ...mapGetters('powergate', ['info']),
+      status() {
+        return this.info ? this.info.status : 'Loading...';
+      },
+      shortAccount() {
+        return this.info ? this.dotDotDot(this.info.balancesList[0].addr.addr) : 'Loading...';
+      },
+      balance() {
+        return this.info ? this.info.balancesList[0].balance : 'Loading...';
+      }
+    },
     head() {
       return {
         bodyAttrs: {
@@ -89,14 +100,7 @@
     },
     data() {
       return {
-        fileCoin: {
-          versions: null,
-          height: null
-        },
-        wallet: {
-          address: 't3re3sdjgqjgj6w4rwuggh24loy564sgibjh6z6wn6gm2abwxenulspk3vxweeiecdr4pwyj4ikribks5ib4la',
-          balance: null
-        }
+
       };
     },
     methods: {
@@ -108,11 +112,6 @@
         return '';
       }
     },
-    async mounted() {
-      this.fileCoin.version = '';
-      this.fileCoin.apiVersion = '';
-      this.fileCoin.blockDelay = '';
-    }
   };
 </script>
 

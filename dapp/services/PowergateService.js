@@ -15,6 +15,13 @@ export default class PowergateService {
 
   async setToken(token) {
     await this.pow.setToken(token);
+
+    // Get ffs info
+    const { info } = await this.pow.ffs.info();
+    this.balancesList = info.balancesList;
+
+    const {status} = await this.pow.health.check();
+    this.status = status;
   }
 
   async addDataToIpfs(data) {
@@ -78,6 +85,20 @@ export default class PowergateService {
 
       //getContent(logEvent.cid)
     //}, cid);
+  }
+
+  async getJsonData(cid) {
+    let bytes = await this.pow.ffs.get(cid);
+    const decodeResult = new TextDecoder("utf-8").decode(bytes);
+    return JSON.parse(decodeResult);
+  }
+
+  getBalancesList() {
+    return this.balancesList;
+  }
+
+  getFfsStatus() {
+    return this.status;
   }
 
   setTokenInLocalStorage(token) {
