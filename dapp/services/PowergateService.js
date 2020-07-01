@@ -5,13 +5,16 @@ export default class PowergateService {
   constructor() {
     const host = "http://0.0.0.0:6002" // or whatever powergate instance you want
 
-    const pow = createPow({ host })
+    this.pow = createPow({ host });
+  }
 
-    pow.ffs.create().then(({ token }) => {
-      pow.setToken(token);
-    });
+  async requestToken() {
+    const { token } = await this.pow.ffs.create();
+    return token;
+  }
 
-    this.pow = pow;
+  async setToken(token) {
+    await this.pow.setToken(token);
   }
 
   async addDataToIpfs(data) {
@@ -45,18 +48,20 @@ export default class PowergateService {
     return this.pow.ffs.watchJobs(callback, jobId);
   }
 
-  watchLogs(cid) {
-    const pow = this.pow;
-    const getContent = async (cid) => {
-      let bytes = await pow.ffs.get(cid);
-      const string = new TextDecoder("utf-8").decode(bytes);
-      console.log('retrieved data');
-      console.log(string);
-    };
+  watchLogs(callback, cid) {
+    // const pow = this.pow;
+    // const getContent = async (cid) => {
+    //   let bytes = await pow.ffs.get(cid);
+    //   const string = new TextDecoder("utf-8").decode(bytes);
+    //   console.log('retrieved data');
+    //   console.log(string);
+    // };
 
-    return this.pow.ffs.watchLogs((logEvent) => {
-      console.log(`received event for cid ${logEvent.cid}`)
-      console.log(`event`, logEvent)
+    return this.pow.ffs.watchLogs(callback, cid);
+
+    //return this.pow.ffs.watchLogs((logEvent) => {
+      //console.log(`received event for cid ${logEvent.cid}`)
+      //console.log(`event`, logEvent)
 
       // --- Expected Event Messages Post Storage Deal ---
       // Hot-Storage execution ran successfully.
@@ -71,7 +76,22 @@ export default class PowergateService {
       // Deal 2 with miner t01000 is active on-chain
       // Cold-Storage execution ran successfully. -- TODO - could use the presence of this event to trigger minting
 
-      getContent(logEvent.cid)
-    }, cid);
+      //getContent(logEvent.cid)
+    //}, cid);
+  }
+
+  setTokenInLocalStorage(token) {
+    console.log('Adding ffs token to local storage');
+    localStorage.setItem('token', token);
+  };
+
+  getTokenFromStorage() {
+    console.log('Retrieving ffs token from local storage');
+    return localStorage.getItem('token');
+  };
+
+  clearTokenFromLocalStorage() {
+    console.log('Clearing ffs token from local storage');
+    localStorage.removeItem('token');
   }
 }

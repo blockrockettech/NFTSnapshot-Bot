@@ -17,6 +17,11 @@
 
         <br/>
         <b-button @click="buy">Buy Thread</b-button>
+        <br/>
+        <p>Status updates:</p>
+        <div v-for="(log, idx) in logs.reverse()" :key="log.msg">
+          {{ log.msg }}
+        </div>
       </div>
     </div>
     <div v-else class="column">
@@ -50,16 +55,30 @@
       return {
         tweetByStatusId: null,
         threadData: null,
+        logs: []
       };
     },
     async asyncData({app, params}) {
       return {tweetByStatusId: params.id};
     },
     async mounted() {
+      // TODO - move service initialisation out of this method. Just here visiting temporarily
+      // Init firebase
       firebase.initializeApp(FirebaseConfig);
-
       var db = firebase.firestore();
 
+      // Init powergate service
+      let token = powergateService.getTokenFromStorage();
+      if (token === null || token === 'null') {
+        // we need to get a token
+        console.log('getting a new ffs token...');
+        token = await powergateService.requestToken();
+      }
+
+      powergateService.setToken(token);
+      powergateService.setTokenInLocalStorage(token);
+
+      // Get tweet
       const tweet = await db.collection('tweets').doc(this.tweetByStatusId).get();
 
       this.threadData = tweet.data();
@@ -69,30 +88,20 @@
       async buy() {
         console.log('buy started...')
 
-        // const json = {
-        //   hello: 'world'
-        // };
-        //
-        // const cid = await powergateService.addDataToIpfs(json);
         console.log('create storage deal...')
         const jobId = await powergateService.storeIpfsDataOnFileCoin(this.threadData.ipfsHash);
+        console.log('job id', jobId);
 
-        const mintNft = this.mintNft;
-        const callback = (job) => {
-          if (job.status === ffs.JobStatus.CANCELED) {
-            console.log("job canceled")
-          } else if (job.status === ffs.JobStatus.FAILED) {
-            console.log("job failed")
-          } else if (job.status === ffs.JobStatus.SUCCESS) {
-            console.log("job success!")
-            mintNft();
+        const logCallback = (log) => {
+          this.logs.push(log);
+
+          if (log.msg === 'Cold-Storage execution ran successfully.') {
+            console.log('Time to mint the rollup...');
+            this.mintNft();
           }
         };
 
-        console.log('job id', jobId);
-
-        powergateService.watchJob(jobId, callback);
-        powergateService.watchLogs(this.threadData.ipfsHash);
+        powergateService.watchLogs(logCallback, this.threadData.ipfsHash);
       },
       async mintNft() {
         await this.nftContract.mint(this.threadData.ipfsHash, this.account);
