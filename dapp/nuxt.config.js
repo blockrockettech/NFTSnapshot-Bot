@@ -1,5 +1,7 @@
 require('./config');
 
+const FirebaseConfig = require("./_keys/firebase.json");
+
 module.exports = {
   mode: 'universal',
   server: {
@@ -94,7 +96,7 @@ module.exports = {
   */
   plugins: [
     '~/plugins/filters.js',
-    '~/plugins/firebase.js',
+    '~/plugins/vue-moment.js',
     '~/plugins/powergateService.client.js',
     '~/plugins/web3ethers.client.js'
   ],
@@ -119,7 +121,17 @@ module.exports = {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
+    // Doc: https://firebase.nuxtjs.org/guide/getting-started/#full-configuration
+    '@nuxtjs/firebase'
   ],
+
+  firebase: {
+    config: FirebaseConfig,
+    services: {
+      auth: true,
+      firestore: true,
+    }
+  },
 
   /*
   ** Axios module configuration

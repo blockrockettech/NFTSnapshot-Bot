@@ -18,18 +18,35 @@
             <div class="tile is-parent">
                 <div class="tile is-child notification is-white">
                     <div class="columns">
-                        <div class="columns is-multiline">
-                            <div class="column is-one-third">
+                        <div class="column" v-for="(tweet,idx) in validThreads" :key="idx">
+                            <n-link :to="`/gallery/${tweet.originalTweetId}`">
+                                <div class="card">
+                                <div class="card-image">
+                                    <figure class="image is-4by3">
+                                        <img src="https://bulma.io/images/placeholders/1280x960.png" alt="Placeholder image">
+                                    </figure>
+                                </div>
+                                <div class="card-content">
+                                    <div class="media">
+                                        <div class="media-left">
+                                            <figure class="image is-48x48">
+                                                <img src="https://bulma.io/images/placeholders/96x96.png" alt="Placeholder image">
+                                            </figure>
+                                        </div>
+                                        <div class="media-content">
+                                            <p class="title is-4">{{tweet.originalTweetId}}</p>
+                                            <p class="subtitle is-6">@{{tweet.originalTaggerId}}</p>
+                                        </div>
+                                    </div>
 
-                                <blockquote class="twitter-tweet"><p lang="en" dir="ltr">1⃣0⃣0⃣0⃣0⃣0⃣0⃣0⃣ blocks and counting for <a href="https://twitter.com/hashtag/Ethereum?src=hash&amp;ref_src=twsrc%5Etfw">#Ethereum</a> 🥳<a href="https://t.co/gwKZCykrcF">https://t.co/gwKZCykrcF</a><a href="https://twitter.com/hashtag/Blockchain?src=hash&amp;ref_src=twsrc%5Etfw">#Blockchain</a></p>&mdash; BlockRocketTech 🚀 (@BlockRocketTech) <a href="https://twitter.com/BlockRocketTech/status/1257306809058000896?ref_src=twsrc%5Etfw">May 4, 2020</a></blockquote>
-                                <n-link :to="{name:'gallery-id', params:{id:1257306809058000896}}">NFT IT!</n-link>
+                                    <div class="content">
+                                        {{tweet.threadName}}
+                                        <br>
+                                        <time datetime="2016-1-1">{{tweet.timestamp | moment("from")}}</time>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="column is-one-third">
-                                <blockquote class="twitter-tweet"><p lang="en" dir="ltr">This is brilliant 👏💥 <a href="https://twitter.com/CryptoKaijuIO?ref_src=twsrc%5Etfw">@CryptoKaijuIO</a> goes gaming, bring it on! <a href="https://t.co/QQpbcqNzIO">https://t.co/QQpbcqNzIO</a></p>&mdash; BlockRocketTech 🚀 (@BlockRocketTech) <a href="https://twitter.com/BlockRocketTech/status/1255604506383048704?ref_src=twsrc%5Etfw">April 29, 2020</a></blockquote>
-                            </div>
-                            <div class="column is-one-third">
-                                <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Look who tops USD traded this week 👀<br><br> <a href="https://twitter.com/KnownOrigin_io?ref_src=twsrc%5Etfw">@KnownOrigin_io</a> 🥇<br><br>If you want a table-topping dApp building or have crazy blockchain ideas then ping us 📨 <a href="https://t.co/LoRdAdYpsg">https://t.co/LoRdAdYpsg</a></p>&mdash; BlockRocketTech 🚀 (@BlockRocketTech) <a href="https://twitter.com/BlockRocketTech/status/1255448278981840897?ref_src=twsrc%5Etfw">April 29, 2020</a></blockquote>
-                            </div>
+                            </n-link>
                         </div>
                     </div>
                 </div>
@@ -39,7 +56,22 @@
 </template>
 
 <script>
-    export default {};
+    export default {
+      data() {
+        return {
+          tweets: []
+        }
+      },
+      computed: {
+        validThreads() {
+          return this.tweets.filter(tweet => tweet.threadName && tweet.threadName.length > 0);
+        }
+      },
+      async asyncData({app}) {
+        const snapshot = await app.$fireStore.collection('tweets').get();
+        return {tweets: snapshot.docs.map(doc => doc.data())};
+      },
+    };
 </script>
 
 <style></style>

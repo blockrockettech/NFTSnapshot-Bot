@@ -32,10 +32,6 @@
 <script>
   import {mapGetters} from 'vuex';
 
-  import firebase from "firebase";
-  import "firebase/firestore";
-  import FirebaseConfig from "../../_keys/firebase.json";
-
   export default {
     computed: {
       ...mapGetters('web3ethers', [
@@ -51,18 +47,10 @@
       };
     },
     async asyncData({app, params}) {
-      return {tweetByStatusId: params.id};
-    },
-    async mounted() {
-      // TODO this is temp until I can get the plugin to work
-      firebase.initializeApp(FirebaseConfig);
-      const db = firebase.firestore();
-
       // Get tweet
-      const tweet = await db.collection('tweets').doc(this.tweetByStatusId).get();
+      const tweet = await app.$fireStore.collection('tweets').doc(params.id).get();
 
-      this.threadData = tweet.data();
-      console.log(this.threadData);
+      return {tweetByStatusId: params.id, threadData: tweet.data()};
     },
     methods: {
       async buy() {
