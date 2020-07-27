@@ -16,7 +16,7 @@ class PowergateService {
 
   async addDataToIpfs(data) {
     const buffer = Buffer.from(JSON.stringify(data));
-    const { cid } = await this.pow.ffs.addToHot(buffer);
+    const { cid } = await this.pow.ffs.stage(buffer);
     return cid;
   }
 }
