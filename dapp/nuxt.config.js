@@ -1,7 +1,5 @@
 require('./config');
 
-const FirebaseConfig = require("./_keys/firebase.json");
-
 module.exports = {
   mode: 'universal',
   server: {
@@ -126,7 +124,12 @@ module.exports = {
   ],
 
   firebase: {
-    config: FirebaseConfig,
+    config: {
+      "apiKey": "AIzaSyDa8-zk5NUozmEQTU5ZX-DJtEkNPX96jlQ",
+      "authDomain": "nftsnapshotbot.firebaseapp.com",
+      "databaseURL": "https://nftsnapshotbot.firebaseio.com",
+      "projectId": "nftsnapshotbot"
+    },
     services: {
       auth: true,
       firestore: true,

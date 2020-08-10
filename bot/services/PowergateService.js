@@ -3,7 +3,7 @@ const {Buffer} = require("buffer");
 
 class PowergateService {
   constructor() {
-    const host = "http://0.0.0.0:6002" // or whatever powergate instance you want
+    const host = process.env.POWERGATE_HOST // or whatever powergate instance you want
 
     const pow = createPow({ host })
 
