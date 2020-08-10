@@ -109,7 +109,7 @@ class TwitterService {
     console.log(`Posting tweet rollup confirmation`, tweetId);
 
     return this.twit.post('statuses/update', {
-      status: `Rollup created - claim ownership of the unstoppable NFT here - https://filecoin.rollup.bang/claim/${tweetId}`,
+      status: `Rollup created - claim ownership of the unstoppable NFT here - https://rollup.blockrocket.tech/gallery/${tweetId}`,
       in_reply_to_status_id: tweetId
     });
   }

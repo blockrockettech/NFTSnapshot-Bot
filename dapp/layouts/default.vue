@@ -35,12 +35,9 @@
                             Filecoin Network Info
                         </p>
                         <div class="subtitle is-6">
-                            Versions: {{fileCoin.version || 'Loading...'}} <br/>
-                            API V: {{fileCoin.apiVersion || 'Loading...'}} <br/>
-                            BlockDelay: {{fileCoin.blockDelay || 'Loading...'}} <br/>
-                            Block Height: {{fileCoin.height || 'Loading...'}} <br/>
-                            Account: {{dotDotDot(wallet.address) || 'Loading...'}} <br/>
-                            Wallet balance: {{wallet.balance || 'Loading...'}}
+                            Status {{status}} <br/>
+                            Account: {{shortAccount}} <br/>
+                            Balance: {{balance}} <br/>
                         </div>
                     </div>
                 </div>
@@ -79,11 +76,21 @@
 </template>
 
 <script>
-  import LotusRPC from '@filecoin-shipyard/lotus-client-rpc';
-  import BrowserProvider from '@filecoin-shipyard/lotus-client-provider-browser';
-  import schema from '@filecoin-shipyard/lotus-client-schema/prototype/testnet-v3';
+    import {mapGetters} from 'vuex';
 
   export default {
+    computed: {
+      ...mapGetters('powergate', ['info']),
+      status() {
+        return this.info ? this.info.status : 'Loading...';
+      },
+      shortAccount() {
+        return this.info ? this.dotDotDot(this.info.balancesList[0].addr.addr) : 'Loading...';
+      },
+      balance() {
+        return this.info ? this.info.balancesList[0].balance : 'Loading...';
+      }
+    },
     head() {
       return {
         bodyAttrs: {
@@ -93,14 +100,7 @@
     },
     data() {
       return {
-        fileCoin: {
-          versions: null,
-          height: null
-        },
-        wallet: {
-          address: 't3re3sdjgqjgj6w4rwuggh24loy564sgibjh6z6wn6gm2abwxenulspk3vxweeiecdr4pwyj4ikribks5ib4la',
-          balance: null
-        }
+
       };
     },
     methods: {
@@ -112,20 +112,6 @@
         return '';
       }
     },
-    async mounted() {
-      const wsUrl = 'wss://lotus.testground.ipfs.team/api/0/node/rpc/v0';
-      const provider = new BrowserProvider(wsUrl);
-      const client = new LotusRPC(provider, {schema});
-      const {Version, APIVersion, BlockDelay} = await client.version();
-      this.fileCoin.version = Version;
-      this.fileCoin.apiVersion = APIVersion;
-      this.fileCoin.blockDelay = BlockDelay;
-      this.wallet.balance = await client.walletBalance(this.wallet.address);
-      setInterval(async () => {
-        const result = await client.chainHead();
-        this.fileCoin.height = result.Height;
-      }, 1000);
-    }
   };
 </script>
 

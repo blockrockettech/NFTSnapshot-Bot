@@ -94,6 +94,9 @@ module.exports = {
   */
   plugins: [
     '~/plugins/filters.js',
+    '~/plugins/vue-moment.js',
+    '~/plugins/powergateService.client.js',
+    '~/plugins/web3ethers.client.js'
   ],
   /*
   ** Nuxt.js dev-modules
@@ -116,7 +119,22 @@ module.exports = {
     '@nuxtjs/pwa',
     // Doc: https://github.com/nuxt-community/dotenv-module
     '@nuxtjs/dotenv',
+    // Doc: https://firebase.nuxtjs.org/guide/getting-started/#full-configuration
+    '@nuxtjs/firebase'
   ],
+
+  firebase: {
+    config: {
+      "apiKey": "AIzaSyDa8-zk5NUozmEQTU5ZX-DJtEkNPX96jlQ",
+      "authDomain": "nftsnapshotbot.firebaseapp.com",
+      "databaseURL": "https://nftsnapshotbot.firebaseio.com",
+      "projectId": "nftsnapshotbot"
+    },
+    services: {
+      auth: true,
+      firestore: true,
+    }
+  },
 
   /*
   ** Axios module configuration

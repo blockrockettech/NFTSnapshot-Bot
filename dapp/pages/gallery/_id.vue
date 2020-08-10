@@ -1,7 +1,27 @@
 <template>
   <div class="columns is-centered">
-    <div v-if="tweetByStatusId" class="column is-four-fifths has-background-primary is-size-1">
-      {{ tweetByStatusId }}
+    <div v-if="tweetByStatusId">
+      <div v-if="threadData && threadData.thread">
+        <div class="column is-four-fifths is-size-3">
+            {{threadData.threadName}}
+        </div>
+        <br/>
+        <div v-for="(tweet,idx) in threadData.thread.reverse()" :key="idx">
+          {{idx+1}}/{{threadData.thread.length}}: {{tweet.text}}
+        </div>
+
+        <br/>
+        <h2>IPFS Hash:</h2>
+        {{threadData.ipfsHash}}
+
+        <br/>
+        <b-button @click="buy">Buy Thread</b-button>
+        <br/>
+        <p>Status updates:</p>
+        <div v-for="(log, idx) in logs.reverse()" :key="log.msg">
+          {{ log.msg }}
+        </div>
+      </div>
     </div>
     <div v-else class="column">
       No tweet for {{ $route.params.id }}
@@ -10,19 +30,50 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex';
+
   export default {
-    components: {},
+    computed: {
+      ...mapGetters('web3ethers', [
+         'nftContract',
+         'account'
+      ]),
+    },
     data() {
       return {
         tweetByStatusId: null,
+        threadData: null,
+        logs: []
       };
     },
-    async asyncData({app, params, $axios}) {
-      // const thread = encodeURIComponent(`https://twitter.com/BlockRocketTech/status/${params.id}`);
-      // const tweetByStatusId = await $axios.$get(`https://publish.twitter.com/oembed?url=${thread}&align=center`)
+    async asyncData({app, params}) {
+      // Get tweet
+      const tweet = await app.$fireStore.collection('tweets').doc(params.id).get();
 
+      return {tweetByStatusId: params.id, threadData: tweet.data()};
+    },
+    methods: {
+      async buy() {
+        console.log('buy started...')
 
-      return {tweetByStatusId: params.id};
+        console.log('create storage deal...')
+        const jobId = await this.$powergateService.storeIpfsDataOnFileCoin(this.threadData.ipfsHash);
+        console.log('job id', jobId);
+
+        const logCallback = (log) => {
+          this.logs.push(log);
+
+          if (log.msg === 'Cold-Storage execution ran successfully.') {
+            console.log('Time to mint the rollup...');
+            this.mintNft();
+          }
+        };
+
+        this.$powergateService.watchLogs(logCallback, this.threadData.ipfsHash);
+      },
+      async mintNft() {
+        await this.nftContract.mint(this.threadData.ipfsHash, this.account);
+      },
     },
     // head() {
     //   return {
